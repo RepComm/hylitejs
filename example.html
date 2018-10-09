@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+        <base href="hylitejs" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>Hylite Example</title>
+        <style>
+        body {
+            margin:0px;
+            width:100vw;
+            height:100vh;
+            overflow:hidden;
+        }
+        #jsEditor {
+            position:absolute;
+            top:10%;
+            left:1%;
+            height:80%;
+            width:48%;
+            background-color:rgb(44, 44, 44);
+            color:rgb(224, 224, 224);
+            border:none;
+            border-radius:1vw;
+        }
+        #jsResult {
+            position:absolute;
+            top:10%;
+            right:1%;
+            height:80%;
+            width:48%;
+            background-color:rgb(44, 44, 44);
+            color:rgb(224, 224, 224);
+            border:none;
+            border-radius:1vw;
+        }
+        </style>
+	</head>
+	<body>
+        <code id="jsEditor" contenteditable="true"></code>
+        <textarea id="jsResult"></textarea>
+        <script src="example.js" type="module"></script>
+	</body>
+</html>
