@@ -54,8 +54,20 @@ class Lexer {
         }
         return result;
     }
+    static scan_whitespace (start, toScan) {
+        let toScanLength = toScan.length;
+        let result = "";
+        for (let i=start; i<toScanLength; i++) {
+            if (toScan[i] !== ' ') {
+                return result;
+            } else {
+                result+=toScan[i];
+            }
+        }
+        return result;
+    }
     static lex (data) {
-        data = data.replace(/\s/g, " ");
+        data = data.replace(/ /g,' ');
         let tokens = [];
         let currentToken;
         let currentLine = 0;
@@ -63,11 +75,39 @@ class Lexer {
 
         for (let i=0; i<data.length; i++) {
             if (data[i] == " ") {
-                //Do nothing
+                let whitespace = Lexer.scan_whitespace(i, data);
+                i+=whitespace.length+1;
+
+                currentToken = {
+                    type:"whitespace",
+                    data:whitespace,
+                    lineNumber:currentLine,
+                    charInLine:i-thisLineCharOffset
+                }
+                tokens.push(currentToken);
             } else if (data[i] == '\n') {
-                console.log("Got new line");
+                currentToken = {
+                    type:"new_line",
+                    lineNumber:currentLine,
+                    charInLine:i-thisLineCharOffset
+                }
+                tokens.push(currentToken);
                 currentLine++;
                 thisLineCharOffset = i;
+            } else if (data[i] == '/') {
+                if (i !== data.length-1 && data[i+1] == "/") {
+                    let cmt = Lexer.scan_comment_line(i+2, data);
+                    i+= cmt.length + 1;
+                    console.log("Code comment:", cmt); 
+                } else {
+                    currentToken = {
+                        type:"operator",
+                        data:data[i],
+                        lineNumber:currentLine,
+                        charInLine:i-thisLineCharOffset
+                    }
+                    tokens.push(currentToken);
+                }
             } else if ("+-*/<>".includes(data[i])) {
                 currentToken = {
                     type:"operator",
@@ -125,15 +165,59 @@ class Lexer {
                 tokens.push(currentToken);
             } else if (data[i] == '\t') {
 
-            } else if (data[i] == '#') {
-                let cmt = Lexer.scan_comment_line(i, data);
-                i+= cmt.length;
-                console.log("Code comment:", cmt);
             } else {
                 console.error("Illegal char to parse", data[i], "at line", currentLine, ":", i-thisLineCharOffset);
             }
         }
         return tokens;
+    }
+}
+
+class HtmlHelper {
+    static symbol (txt) {
+        let span = document.createElement("span");
+        span.textContent = txt;
+        span.className = "symbol";
+        return span;
+    }
+    static operator (txt) {
+        let span = document.createElement("span");
+        span.textContent = txt;
+        span.className = "operator";
+        return span;
+    }
+    static keyword (txt) {
+        let span = document.createElement("span");
+        span.textContent = txt;
+        span.className = "keyword";
+        return span;
+    }
+    static identifier (txt) {
+        let span = document.createElement("span");
+        span.textContent = txt;
+        span.className = "identifier";
+        return span;
+    }
+    static other_text (txt) {
+        let span = document.createElement("span");
+        span.textContent = txt;
+        span.className = "other_text";
+        return span;
+    }
+    static number_literal (txt) {
+        let span = document.createElement("span");
+        span.textContent = txt;
+        span.className = "number_literal";
+        return span;
+    }
+    static string_literal (txt) {
+        let span = document.createElement("span");
+        span.textContent = "\"" + txt + "\"";
+        span.className = "string_literal";
+        return span;
+    }
+    static new_line () {
+        return document.createElement("br");
     }
 }
 
@@ -150,7 +234,14 @@ class HyliteEditor {
         });
     }
     onContentChanged (evt) {
+        clearTimeout(this.highlightTimeout);
+        if (evt.ctrlKey) {
+            if (evt.key == "v") {
+                return;
+            }
+        }
         if (evt.key === "Tab") {
+            evt.preventDefault();
             let sel = window.getSelection();
             let offset = sel.focusOffset;
             let focus = sel.focusNode;
@@ -180,18 +271,62 @@ class HyliteEditor {
             sel.addRange(range);
         }
         let tokens = Lexer.lex(this.element.innerText);
-        if (tokens) {
-            if (this.debugelement) {
-                let txt = "";
+        this.highlightTimeout = setTimeout(()=>{
+            if (tokens) {
+                this.element.innerHTML = "";
                 for (let i=0; i<tokens.length; i++) {
-                    txt += tokens[i].type + " " + tokens[i].data + "\n";
+                    switch (tokens[i].type) {
+                        case "symbol":
+                        this.element.appendChild(HtmlHelper.symbol(tokens[i].data));
+                        break;
+                        case "operator":
+                        this.element.appendChild(HtmlHelper.operator(tokens[i].data));
+                        break;
+                        case "keyword":
+                        this.element.appendChild(HtmlHelper.keyword(tokens[i].data));
+                        break;
+                        case "identifier":
+                        this.element.appendChild(HtmlHelper.identifier(tokens[i].data));
+                        break;
+                        case "number_literal":
+                        this.element.appendChild(HtmlHelper.number_literal(tokens[i].data));
+                        break;
+                        case "string_literal":
+                        this.element.appendChild(HtmlHelper.string_literal(tokens[i].data));
+                        break;
+                        case "new_line":
+                        this.element.appendChild(HtmlHelper.new_line());
+                        break;
+                        default:
+                        this.element.appendChild(HtmlHelper.other_text(tokens[i].data));
+                        break;
+                    }
                 }
-                this.debugelement.innerHTML = txt;
+                if (this.debugelement) {
+                    let txt = "";
+                    for (let i=0; i<tokens.length; i++) {
+                        if (tokens[i].data) {
+                            txt += tokens[i].type + " " + tokens[i].data + "\n";
+                        }
+                    }
+                    this.debugelement.innerHTML = txt;
+                }
+            } else {
+                //this.debugelement.innerHTML = "No Tokens yet";
             }
-        } else {
-            //this.debugelement.innerHTML = "No Tokens yet";
-        }
-        //this.tokenize(this.element.innerText);// + evt.key);
+            //this.tokenize(this.element.innerText);// + evt.key);
+            let sel = window.getSelection();
+            let offset = sel.focusOffset;
+            let focus = sel.focusNode;
+
+            let range = document.createRange();
+            range.selectNode(focus);
+            range.setStart(focus, offset);
+
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }, 500);
     }
     /** Hook this editor class to a specific HTMLTextAreaElement
      * @param {HTMLTextAreaElement} ta

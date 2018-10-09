@@ -24,6 +24,7 @@
             border-radius:1vw;
             font-family:'Courier New', Courier, monospace;
             padding-left:2em;
+            white-space:pre;
         }
         #jsResult {
             position:absolute;
@@ -36,10 +37,31 @@
             border:none;
             border-radius:1vw;
         }
+        .symbol {
+            color:rgb(170, 80, 255);
+        }
+        .operator {
+            color:rgb(255, 0, 0);
+        }
+        .keyword {
+            color:rgb(255, 187, 0);
+        }
+        .identifier {
+            color:#ffb350;
+        }
+        .number_literal {
+            color:rgb(0, 247, 255);
+        }
+        .string_literal {
+            color:#ffb350;
+        }
+        .other_text {
+            color:inherit;
+        }
         </style>
 	</head>
 	<body>
-        <div id="jsEditor" contenteditable="true"></div>
+        <div id="jsEditor" contenteditable="true"><span>function hi () {}</span></div>
         <textarea id="jsResult"></textarea>
         <script src="example.js" type="module"></script>
 	</body>
