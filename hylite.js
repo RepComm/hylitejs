@@ -68,7 +68,7 @@ class Lexer {
                 console.log("Got new line");
                 currentLine++;
                 thisLineCharOffset = i;
-            } else if ("+-*/".includes(data[i])) {
+            } else if ("+-*/<>".includes(data[i])) {
                 currentToken = {
                     type:"operator",
                     data:data[i],
@@ -112,6 +112,8 @@ class Lexer {
             } else if (data[i].match("[_a-zA-Z]")) {
                 let identifier = Lexer.scan_identifier(i, data);
 
+                //For keywords loop
+
                 currentToken = {
                     type:"identifier",
                     data:identifier,
@@ -128,8 +130,7 @@ class Lexer {
                 i+= cmt.length;
                 console.log("Code comment:", cmt);
             } else {
-                console.log("got", data[i], data[i].charCodeAt(0), " ".charCodeAt(0));
-                //console.error("Illegal char to parse", data[i], "at line", currentLine, ":", i-thisLineCharOffset);
+                console.error("Illegal char to parse", data[i], "at line", currentLine, ":", i-thisLineCharOffset);
             }
         }
         return tokens;
@@ -143,60 +144,22 @@ class HyliteEditor {
         this.language = undefined;
         this.onchangehook = (evt)=>this.onContentChanged(evt);
     }
-
-    tokenize (text) {
-        let tokens = undefined;
-        let chars = undefined;
-        let char;
-        for (let i=0; i<text.length; i++) {
-            char = text[i];
-            if (this.language.isTerminator(char)) {
-                if (chars) {
-                    //if (!tokens) tokens = [];
-
-
-                    //tokens.push(chars);
-                }
-                chars = undefined;
-            } else {
-                if (!chars) {
-                    chars = "";
-                    chars += char;
-                } else {
-                    chars += char;
-                    if (i===text.length-1 || this.language.isTerminator(text[i+1])) {
-                        if (this.language.isKeyword(chars)) {
-                            if (!tokens) tokens = [];
-                            tokens.push({
-                                type:"keyword",
-                                data:chars
-                            });
-                            chars = undefined;
-                        } else if (this.language.isSymbol(text[i])) {
-                            if (!tokens) tokens = [];
-                            tokens.push({
-                                type:"symbol",
-                                data:text[i]
-                            });
-                            chars = undefined;
-                        }
-                    }
-                }
-            }
-        }
-        if (tokens) {
-            if (this.debugelement) {
-                let txt = "";
-                for (let i=0; i<tokens.length; i++) {
-                    txt += tokens[i].type + " " + tokens[i].data + "\n";
-                }
-                this.debugelement.innerHTML = txt;
-            }
-        } else {
-            this.debugelement.innerHTML = "No Tokens yet";
-        }
-    }
     onContentChanged (evt) {
+        if (evt.key === "\"") {
+            let sel = window.getSelection();
+            let offset = sel.focusOffset;
+            let focus = sel.focusNode;
+
+            focus.textContent += "\"";
+
+            let range = document.createRange();
+            range.selectNode(focus);
+            range.setStart(focus, offset);
+
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
         let tokens = Lexer.lex(this.element.innerText);
         if (tokens) {
             if (this.debugelement) {
@@ -207,7 +170,7 @@ class HyliteEditor {
                 this.debugelement.innerHTML = txt;
             }
         } else {
-            this.debugelement.innerHTML = "No Tokens yet";
+            //this.debugelement.innerHTML = "No Tokens yet";
         }
         //this.tokenize(this.element.innerText);// + evt.key);
     }
@@ -215,7 +178,7 @@ class HyliteEditor {
      * @param {HTMLTextAreaElement} ta
      * @returns {Boolean} True if successful, false otherwise
      */
-    hookToCode (ta) {
+    hookToDiv (ta) {
         if (ta) {
             this.isHooked = true;
 

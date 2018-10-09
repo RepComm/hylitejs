@@ -10,6 +10,6 @@ let jsResult = elem("jsResult");
 HyliteLanguage.fromJson("languages/javascript.json", (error, language)=>{
     editor.setLanguage(language);
 
-    editor.hookToCode(jsEditor);
+    editor.hookToDiv(jsEditor);
     editor.hookDebugTo(jsResult);
 });

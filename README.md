@@ -1,2 +1,4 @@
 # hylitejs
-A (wip) liteweight syntax highlighter for HTMLTextAreaElement written in JavaScript
+A (wip) liteweight syntax highlighter for `<div>` tags written in JavaScript
+
+View example online: https://repcomm.github.io/hylite/example.html
