@@ -34,7 +34,7 @@ class Lexer {
         let toScanLength = toScan.length;
         let result = "";
         for (let i=start; i<toScanLength; i++) {
-            if (toScan[i].match("[_a-zA-Z0-9]")) {
+            if (toScan[i].match(/[_a-zA-Z0-9]/)) {
                 result+=toScan[i];
             } else {
                 return result;
@@ -109,7 +109,7 @@ class Lexer {
 
                 i+= literal.length-1;
                 tokens.push(currentToken);
-            } else if (data[i].match("[_a-zA-Z]")) {
+            } else if (data[i].match(/[_a-zA-Z]/)) {
                 let identifier = Lexer.scan_identifier(i, data);
 
                 //For keywords loop
@@ -121,7 +121,7 @@ class Lexer {
                     charInLine:i-thisLineCharOffset
                 };
 
-                i+= identifier.length;
+                i+= identifier.length-1;
                 tokens.push(currentToken);
             } else if (data[i] == '\t') {
 
@@ -143,9 +143,28 @@ class HyliteEditor {
         this.element = undefined;
         this.language = undefined;
         this.onchangehook = (evt)=>this.onContentChanged(evt);
+        document.addEventListener("keypress", (e)=>{
+            if (e.key == "Tab") {
+                e.preventDefault();
+            }
+        });
     }
     onContentChanged (evt) {
-        if (evt.key === "\"") {
+        if (evt.key === "Tab") {
+            let sel = window.getSelection();
+            let offset = sel.focusOffset;
+            let focus = sel.focusNode;
+
+            focus.textContent += "  ";
+
+            let range = document.createRange();
+            range.selectNode(focus);
+            range.setStart(focus, offset+1);
+
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (evt.key === "\"") {
             let sel = window.getSelection();
             let offset = sel.focusOffset;
             let focus = sel.focusNode;
