@@ -1,51 +1,51 @@
 class HtmlHelper {
     static symbol (txt) {
-        let span = document.createElement("span");
-        span.textContent = txt;
-        span.className = "symbol";
-        return span;
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "symbol";
+        return text;
     }
     static operator (txt) {
-        let span = document.createElement("span");
-        span.textContent = txt;
-        span.className = "operator";
-        return span;
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "operator";
+        return text;
     }
     static keyword (txt) {
-        let span = document.createElement("span");
-        span.textContent = txt;
-        span.className = "keyword";
-        return span;
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "keyword";
+        return text;
     }
     static identifier (txt) {
-        let span = document.createElement("span");
-        span.textContent = txt;
-        span.className = "identifier";
-        return span;
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "identifier";
+        return text;
     }
     static other_text (txt) {
-        let span = document.createElement("span");
-        span.textContent = txt;
-        span.className = "other_text";
-        return span;
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "other_text";
+        return text;
     }
     static number_literal (txt) {
-        let span = document.createElement("span");
-        span.textContent = txt;
-        span.className = "number_literal";
-        return span;
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "number_literal";
+        return text;
     }
     static string_literal (txt) {
-        let span = document.createElement("span");
-        span.textContent = "\"" + txt + "\"";
-        span.className = "string_literal";
-        return span;
+        let text = document.createElement("text");
+        text.textContent = "\"" + txt + "\"";
+        text.className = "string_literal";
+        return text;
     }
     static new_line () {
-        let span = document.createElement("span");
-        span.appendChild(document.createElement("br"));
-        span.className = "new_line";
-        return span;
+        let text = document.createElement("text");
+        text.textContent = "\n";
+        text.className = "new_line";
+        return text;
     }
 }
 

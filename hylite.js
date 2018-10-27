@@ -8,7 +8,7 @@ import {Lexer} from "./Lexer.js";
 class HyliteEditor {
     constructor () {
         this.isHooked = false;
-        this.element = undefined;
+        this.editorElement = undefined;
         this.language = undefined;
         this.onchangehook = (evt)=>this.onContentChanged(evt);
         document.addEventListener("keypress", (e)=>{
@@ -18,71 +18,73 @@ class HyliteEditor {
         });
     }
     highlight (caretAbsolutePosition) {
-        let tokens = Lexer.lex(this.element.innerText);
+        let tokens = Lexer.lex(this.editorElement.innerText);
         if (tokens) {
-            this.element.innerHTML = "";
+            this.visualElement.innerHTML = "";
             for (let i=0; i<tokens.length; i++) {
                 switch (tokens[i].type) {
                     case "symbol":
-                    this.element.appendChild(HtmlHelper.symbol(tokens[i].data));
+                    this.visualElement.appendChild(HtmlHelper.symbol(tokens[i].data));
                     break;
                     case "operator":
-                    this.element.appendChild(HtmlHelper.operator(tokens[i].data));
+                    this.visualElement.appendChild(HtmlHelper.operator(tokens[i].data));
                     break;
                     case "keyword":
-                    this.element.appendChild(HtmlHelper.keyword(tokens[i].data));
+                    this.visualElement.appendChild(HtmlHelper.keyword(tokens[i].data));
                     break;
                     case "identifier":
-                    this.element.appendChild(HtmlHelper.identifier(tokens[i].data));
+                    this.visualElement.appendChild(HtmlHelper.identifier(tokens[i].data));
                     break;
                     case "number_literal":
-                    this.element.appendChild(HtmlHelper.number_literal(tokens[i].data));
+                    this.visualElement.appendChild(HtmlHelper.number_literal(tokens[i].data));
                     break;
                     case "string_literal":
-                    this.element.appendChild(HtmlHelper.string_literal(tokens[i].data));
+                    this.visualElement.appendChild(HtmlHelper.string_literal(tokens[i].data));
                     break;
                     case "new_line":
-                    this.element.appendChild(HtmlHelper.new_line());
+                    this.visualElement.appendChild(HtmlHelper.new_line());
                     break;
                     default:
-                    this.element.appendChild(HtmlHelper.other_text(tokens[i].data));
+                    this.visualElement.appendChild(HtmlHelper.other_text(tokens[i].data));
                     break;
                 }
             }
-            let sel = window.getSelection();
-            let range = document.createRange();
-            let newFocus;
+            // let sel = window.getSelection();
+            // let range = document.createRange();
+            // let newFocus;
             
-            let offset = 0, childLength = 0;
+            // let offset = 0, childLength = 0;
 
-            for (let i=0; i<this.element.children.length; i++) {
-                let child = this.element.children[i];
-                childLength = 0;
-                if (child.className === "new_line") {
-                    childLength += 1; //Represents a single \n char
-                } else {
-                    childLength += child.textContent.length;
-                }
-                offset += childLength;
-                console.log("Offset now", offset, "vs", caretAbsolutePosition);
-                if (offset >= caretAbsolutePosition) {
-                    newFocus = child;
-                    offset = offset - caretAbsolutePosition;
-                    if (offset >= newFocus.textContent.length) {
-                        offset = 1;
-                        newFocus = this.element;
-                    }
-                    break;
-                }
-            }
-            console.log(offset, newFocus);
+            // for (let i=0; i<this.editorElement.children.length; i++) {
+            //     let child = this.editorElement.children[i];
+            //     childLength = 0;
+            //     if (child.className === "new_line") {
+            //         childLength += 1; //Represents a single \n char
+            //     } else if (child.className === "string_literal") {
+            //         childLength += child.textContent.length + 2;
+            //     } else {
+            //         childLength += child.textContent.length;
+            //     }
+            //     offset += childLength;
+            //     console.log("Offset now", offset, "vs", caretAbsolutePosition);
+            //     if (offset >= caretAbsolutePosition) {
+            //         newFocus = child;
+            //         offset = offset - caretAbsolutePosition;
+            //         // if (offset >= newFocus.textContent.length) {
+            //         //     offset = 1;
+            //         //     newFocus = this.element;
+            //         // }
+            //         break;
+            //     }
+            // }
+            // console.log(offset, newFocus);
 
-            range.selectNode(newFocus);
-            range.setStart(newFocus, offset+1);
+            // range.selectNode(newFocus);
+            // range.setStart(newFocus, offset+1);
 
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            // range.collapse(true);
+            // sel.removeAllRanges();
+            // sel.addRange(range);
 
             if (this.debugelement) {
                 let txt = "";
@@ -99,31 +101,32 @@ class HyliteEditor {
         }
     }
     onContentChanged (evt) {
-
         //Get the current selection (caret position) regardless of elements in the editor
-        let sel = window.getSelection();
-        let offset = sel.focusOffset;
-        let target = sel.focusNode.parentElement; //Because this span will have a child text node (weird)
+        // let sel = window.getSelection();
+        // let offset = sel.focusOffset;
+        // let target = sel.focusNode.parentElement; //Because this span will have a child text node (weird)
         //console.log("Starting offset", offset, "in", target);
 
-        for (let i=0; i<this.element.children.length; i++) {
-            let child = this.element.children[i];
-            if (child === target) {
-                break; //We already had this offset when we got the selection
-            } else {
-                if (child.className === "new_line") {
-                    offset+=1; //Represents a single \n char
-                } else {
-                    //console.log("Adding", child.textContent.length, "because of", child);
-                    offset += child.textContent.length;
-                }
-            }
-        }
-
+        // for (let i=0; i<this.editorElement.children.length; i++) {
+        //     let child = this.editorElement.children[i];
+        //     if (child === target) {
+        //         break; //We already had this offset when we got the selection
+        //     } else {
+        //         if (child.className === "new_line") {
+        //             offset+=1; //Represents a single \n char
+        //         } else {
+        //             //console.log("Adding", child.textContent.length, "because of", child);
+        //             offset += child.textContent.length;
+        //         }
+        //     }
+        // }
         if (evt.ctrlKey) {
-            if (evt.key == "v") {
+            if (evt.key === "v") {
                 return;
             }
+        }
+        if (evt.key === "Shift") {
+            return;
         }
         if (evt.key == "ArrowLeft" ||
             evt.key == "ArrowRight" ||
@@ -148,34 +151,40 @@ class HyliteEditor {
             sel.removeAllRanges();
             sel.addRange(range);
         } else if (evt.key === "\"") {
-            let sel = window.getSelection();
-            let offset = sel.focusOffset;
-            let focus = sel.focusNode;
+            // let sel = window.getSelection();
+            // let offset = sel.focusOffset;
+            // let focus = sel.focusNode;
 
-            focus.textContent += "\"";
+            // focus.textContent += "\"";
 
-            let range = document.createRange();
-            range.selectNode(focus);
-            range.setStart(focus, offset);
+            // let range = document.createRange();
+            // range.selectNode(focus);
+            // range.setStart(focus, offset);
 
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            // range.collapse(true);
+            // sel.removeAllRanges();
+            // sel.addRange(range);
         }
-        this.highlight(offset);
+        this.highlight(0);//offset);
         
     }
     /** Hook this editor class to a specific HTMLTextAreaElement
      * @param {HTMLTextAreaElement} ta
      * @returns {Boolean} True if successful, false otherwise
      */
-    hookToDiv (ta) {
+    hookToEditor (ta) {
         if (ta) {
             this.isHooked = true;
 
-            this.element = ta;
-            this.element.addEventListener("keyup", this.onchangehook);
+            this.editorElement = ta;
+            this.editorElement.addEventListener("keyup", this.onchangehook);
 
+            return true;
+        }
+    }
+    hookToVisual (div) {
+        if (div) {
+            this.visualElement = div;
             return true;
         }
     }

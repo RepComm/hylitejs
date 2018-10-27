@@ -12,7 +12,7 @@
             overflow:hidden;
             background-color:rgb(15, 15, 15);
         }
-        #jsEditor {
+        #jsEditor, #hiddenEditor {
             position:absolute;
             top:10%;
             left:1%;
@@ -25,6 +25,10 @@
             font-family:'Courier New', Courier, monospace;
             padding-left:2em;
             white-space:pre;
+        }
+        #hiddenEditor {
+            background:transparent;
+            color:#ffffff44;
         }
         #jsResult {
             position:absolute;
@@ -58,10 +62,14 @@
         .other_text {
             color:inherit;
         }
+        text {
+            white-space:pre;
+        }
         </style>
 	</head>
 	<body>
-        <div id="jsEditor" contenteditable="true" spellcheck="false"><span>function hi () {}</span></div>
+        <div id="jsEditor" contenteditable="true" spellcheck="false">function hi () {}</div>
+        <div id="hiddenEditor" contenteditable="true" spellcheck="fasle">function hi () {}</div>
         <textarea id="jsResult"></textarea>
         <script src="example.js" type="module"></script>
 	</body>
