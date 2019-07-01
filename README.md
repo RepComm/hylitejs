@@ -1,8 +1,10 @@
 # hylitejs
-A (wip) liteweight syntax highlighter for `<div>` tags written in JavaScript
+A work in progress syntax highlighted editor for the browser.
 
 View example online: https://repcomm.github.io/hylitejs/example.html
 
-Or watch this youtube clip of me testing it:
-
-https://youtu.be/DZKR89kHdDc
+Planned features:
+- JSON Code Language definitions
+- Syntax styling preferences
+- Custom styles (can already be done with stylus addons for your browser)
+- Available offline

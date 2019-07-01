@@ -10,6 +10,7 @@ class HyliteEditor {
         this.isHooked = false;
         this.editorElement = undefined;
         this.language = undefined;
+        this.lastNewLine = false;
         this.onchangehook = (evt)=>this.onContentChanged(evt);
         document.addEventListener("keypress", (e)=>{
             if (e.key == "Tab") {
@@ -18,7 +19,7 @@ class HyliteEditor {
         });
     }
     highlight (caretAbsolutePosition) {
-        let tokens = Lexer.lex(this.editorElement.innerText);
+        let tokens = Lexer.lex(this.editorElement.value);
         if (tokens) {
             this.visualElement.innerHTML = "";
             for (let i=0; i<tokens.length; i++) {
@@ -89,8 +90,11 @@ class HyliteEditor {
             if (this.debugelement) {
                 let txt = "";
                 for (let i=0; i<tokens.length; i++) {
+                    txt += tokens[i].type;
                     if (tokens[i].data) {
-                        txt += tokens[i].type + " " + tokens[i].data + "\n";
+                        txt += " " + tokens[i].data + "\n";
+                    } else {
+                        txt += "\n";
                     }
                 }
                 this.debugelement.innerHTML = txt;
@@ -101,25 +105,9 @@ class HyliteEditor {
         }
     }
     onContentChanged (evt) {
-        //Get the current selection (caret position) regardless of elements in the editor
-        // let sel = window.getSelection();
-        // let offset = sel.focusOffset;
-        // let target = sel.focusNode.parentElement; //Because this span will have a child text node (weird)
-        //console.log("Starting offset", offset, "in", target);
-
-        // for (let i=0; i<this.editorElement.children.length; i++) {
-        //     let child = this.editorElement.children[i];
-        //     if (child === target) {
-        //         break; //We already had this offset when we got the selection
-        //     } else {
-        //         if (child.className === "new_line") {
-        //             offset+=1; //Represents a single \n char
-        //         } else {
-        //             //console.log("Adding", child.textContent.length, "because of", child);
-        //             offset += child.textContent.length;
-        //         }
-        //     }
-        // }
+        if (evt.key !== "Enter") {
+            this.lastNewLine = false;
+        }
         if (evt.ctrlKey) {
             if (evt.key === "v") {
                 return;
@@ -164,6 +152,8 @@ class HyliteEditor {
             // range.collapse(true);
             // sel.removeAllRanges();
             // sel.addRange(range);
+        } else if (evt.key === "Enter") {
+            evt.preventDefault();
         }
         this.highlight(0);//offset);
         

@@ -29,6 +29,7 @@
         #hiddenEditor {
             background:transparent;
             color:#ffffff44;
+            resize: none;
         }
         #jsResult {
             position:absolute;
@@ -69,7 +70,7 @@
 	</head>
 	<body>
         <div id="jsEditor" contenteditable="true" spellcheck="false">function hi () {}</div>
-        <div id="hiddenEditor" contenteditable="true" spellcheck="fasle">function hi () {}</div>
+        <textarea id="hiddenEditor">function hi () {}</textarea>
         <textarea id="jsResult"></textarea>
         <script src="example.js" type="module"></script>
 	</body>

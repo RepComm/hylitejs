@@ -1,8 +1,4 @@
-Switch to <text> nodes instead of span
 
-text {
-    white-space: pre;
-}
-
-Use text splitting for optimisation
-https://developer.mozilla.org/en-US/docs/Web/API/Text/splitText
+- Scrolling
+- Tab conversions
+- Auto-indention
