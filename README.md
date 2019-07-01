@@ -8,3 +8,5 @@ Planned features:
 - Syntax styling preferences
 - Custom styles (can already be done with stylus addons for your browser)
 - Available offline
+
+![alt text](demo.png "Demo")
