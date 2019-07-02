@@ -12,14 +12,9 @@ class HyliteEditor {
         this.language = undefined;
         this.lastNewLine = false;
         this.onchangehook = (evt)=>this.onContentChanged(evt);
-        document.addEventListener("keypress", (e)=>{
-            if (e.key == "Tab") {
-                e.preventDefault();
-            }
-        });
     }
     highlight (caretAbsolutePosition) {
-        let tokens = Lexer.lex(this.editorElement.value);
+        let tokens = Lexer.lex(this.language, this.editorElement.value);
         if (tokens) {
             this.visualElement.innerHTML = "";
             for (let i=0; i<tokens.length; i++) {
@@ -50,43 +45,6 @@ class HyliteEditor {
                     break;
                 }
             }
-            // let sel = window.getSelection();
-            // let range = document.createRange();
-            // let newFocus;
-            
-            // let offset = 0, childLength = 0;
-
-            // for (let i=0; i<this.editorElement.children.length; i++) {
-            //     let child = this.editorElement.children[i];
-            //     childLength = 0;
-            //     if (child.className === "new_line") {
-            //         childLength += 1; //Represents a single \n char
-            //     } else if (child.className === "string_literal") {
-            //         childLength += child.textContent.length + 2;
-            //     } else {
-            //         childLength += child.textContent.length;
-            //     }
-            //     offset += childLength;
-            //     console.log("Offset now", offset, "vs", caretAbsolutePosition);
-            //     if (offset >= caretAbsolutePosition) {
-            //         newFocus = child;
-            //         offset = offset - caretAbsolutePosition;
-            //         // if (offset >= newFocus.textContent.length) {
-            //         //     offset = 1;
-            //         //     newFocus = this.element;
-            //         // }
-            //         break;
-            //     }
-            // }
-            // console.log(offset, newFocus);
-
-            // range.selectNode(newFocus);
-            // range.setStart(newFocus, offset+1);
-
-            // range.collapse(true);
-            // sel.removeAllRanges();
-            // sel.addRange(range);
-
             if (this.debugelement) {
                 let txt = "";
                 for (let i=0; i<tokens.length; i++) {
@@ -168,6 +126,17 @@ class HyliteEditor {
 
             this.editorElement = ta;
             this.editorElement.addEventListener("keyup", this.onchangehook);
+
+            this.editorElement.addEventListener("keydown", function (e) {
+                if (e.key == "Tab") {
+                    e.preventDefault();
+                    let start = this.selectionStart;
+                    this.value = this.value.substring(0, start) + "  " + this.value.substring(start);
+                    this.selectionStart = start + 2;
+                    this.selectionEnd = this.selectionStart;
+                    return false;
+                }
+            });
 
             return true;
         }

@@ -25,6 +25,7 @@
             font-family:'Courier New', Courier, monospace;
             padding-left:2em;
             white-space:pre;
+            margin:0px;
         }
         #hiddenEditor {
             background:transparent;
@@ -43,16 +44,16 @@
             border-radius:1vw;
         }
         .symbol {
-            color:rgb(170, 80, 255);
+            color:rgb(205, 199, 251);
         }
         .operator {
-            color:rgb(255, 0, 0);
+            color:rgb(184, 184, 184);
         }
         .keyword {
-            color:rgb(255, 187, 0);
+            color:rgb(8, 97, 206);
         }
         .identifier {
-            color:#ffb350;
+            color:#27c1be;
         }
         .number_literal {
             color:rgb(0, 247, 255);
@@ -70,7 +71,7 @@
 	</head>
 	<body>
         <div id="jsEditor" contenteditable="true" spellcheck="false">function hi () {}</div>
-        <textarea id="hiddenEditor">function hi () {}</textarea>
+        <textarea id="hiddenEditor" spellcheck="false">function hi () {}</textarea>
         <textarea id="jsResult"></textarea>
         <script src="example.js" type="module"></script>
 	</body>

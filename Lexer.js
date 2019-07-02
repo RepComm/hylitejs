@@ -17,7 +17,7 @@ class Lexer {
     static scan_string_literal(delim, start, toScan) {
         let end = toScan.indexOf(delim, start);
         if (end === -1) {
-            console.error("Scanned string without finding next", delim);
+            //console.error("Scanned string without finding next", delim);
             return false;
         }
         if (end > toScan.length) {
@@ -62,7 +62,7 @@ class Lexer {
         }
         return result;
     }
-    static lex (data) {
+    static lex (lang, data) {
         data = data.replace(/ /g," ");
         let tokens = [];
         let currentToken;
@@ -149,14 +149,21 @@ class Lexer {
             } else if (data[i].match(/[_a-zA-Z]/)) {
                 let identifier = Lexer.scan_identifier(i, data);
 
-                //For keywords loop
-
-                currentToken = {
-                    type:"identifier",
-                    data:identifier,
-                    lineNumber:currentLine,
-                    charInLine:i-thisLineCharOffset
-                };
+                if (lang.keywords.includes(identifier)) {
+                    currentToken = {
+                        type:"keyword",
+                        data:identifier,
+                        lineNumber:currentLine,
+                        charInLine:i-thisLineCharOffset
+                    };
+                } else {
+                    currentToken = {
+                        type:"identifier",
+                        data:identifier,
+                        lineNumber:currentLine,
+                        charInLine:i-thisLineCharOffset
+                    };
+                }
 
                 i+= identifier.length-1;
                 tokens.push(currentToken);
