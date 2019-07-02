@@ -12,7 +12,34 @@ class HyliteEditor {
         this.language = undefined;
         this.lastNewLine = false;
         this.onchangehook = (evt)=>this.onContentChanged(evt);
+        this.options = {
+            tabConversion:{
+                enabled:true,
+                char:"\t",
+                amount:1,
+                tabCharSize:2 //Width of chars an actual Tab char () takes up, modifies css tab-size
+            },
+            //TODO - Document options and implement
+            autoType:{
+                enabled:true,
+                langDefinitionBased:true, //Use autotype from language definitions
+                globalBased:true, //Use common ones such as quotations and brackets
+                cursorMove:"middle", //pre = don't move cursor, middle = cursor to center, end = past typed chars
+                globalAutoTypeMap:{ //Map of typed to autotyped
+                    "\"":"\"",
+                    "'":"'",
+                    "{":"}",
+                    "(":")",
+                    "`":"`",
+                    "/*":"*/"
+                }
+            }
+
+        };
     }
+    /** Highlights the visual editor
+     * @param {Integer} caretAbsolutePosition (unimplemented) highlight beginning at this index in the code
+     */
     highlight (caretAbsolutePosition) {
         let tokens = Lexer.lex(this.language, this.editorElement.value);
         if (tokens) {
@@ -62,6 +89,9 @@ class HyliteEditor {
             //this.debugelement.innerHTML = "No Tokens yet";
         }
     }
+    /** When the content is changed
+     * @param {KeyboardEvent} evt Event that drove this change
+     */
     onContentChanged (evt) {
         if (evt.key !== "Enter") {
             this.lastNewLine = false;
@@ -127,13 +157,19 @@ class HyliteEditor {
             this.editorElement = ta;
             this.editorElement.addEventListener("keyup", this.onchangehook);
 
-            this.editorElement.addEventListener("keydown", function (e) {
+            this.editorElement.addEventListener("keydown", (e)=>{
                 if (e.key == "Tab") {
                     e.preventDefault();
-                    let start = this.selectionStart;
-                    this.value = this.value.substring(0, start) + "  " + this.value.substring(start);
-                    this.selectionStart = start + 2;
-                    this.selectionEnd = this.selectionStart;
+                    let start = this.editorElement.selectionStart;
+                    let val = this.editorElement.value;
+                    let insert = "";
+                    for (let i=0; i<this.options.tabConversion.amount; i++) {
+                        insert += this.options.tabConversion.char;
+                    }
+
+                    this.editorElement.value = val.substring(0, start) + insert + val.substring(start);
+                    this.editorElement.selectionStart = start + 2;
+                    this.editorElement.selectionEnd = this.editorElement.selectionStart;
                     return false;
                 }
             });
@@ -141,19 +177,39 @@ class HyliteEditor {
             return true;
         }
     }
+    /** Set the display element (HTMLDivElement)
+     * @param {HTMLDivElement} div
+     * @returns {Boolean} True if successful, false otherwise
+     */
     hookToVisual (div) {
         if (div) {
             this.visualElement = div;
             return true;
         }
     }
+    //DEBUG ONLY
     hookDebugTo (ta) {
         if (ta) {
             this.debugelement = ta;
         }
     }
+    /** Set the language type to highlight
+     * @param {HyliteLanguage} lang to syntax highlight
+     */
     setLanguage (lang) {
         this.language = lang;
+    }
+    /** Apply options to this editor instance
+     * @param {Map} opts options to apply
+     * @description Only applies options to keys specified
+     */
+    setOptions (opts) {
+        let keys = Object.keys(opts);
+        let key;
+        for (let i=0; i<keys.length; i++) {
+            key = keys[i];
+            this.options[key] = opts[key];
+        }
     }
 }
 
