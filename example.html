@@ -14,10 +14,10 @@
         }
         #jsEditor, #hiddenEditor {
             position:absolute;
-            top:10%;
+            top:5%;
             left:1%;
-            height:80%;
-            width:46%;
+            width:90%;
+            height:90%;
             background-color:rgb(44, 44, 44);
             color:rgb(224, 224, 224);
             border:none;
@@ -28,11 +28,15 @@
             margin:0px;
             -moz-tab-size: 4;
         }
+        #jsEditor {
+            overflow-y:hidden;
+        }
         #hiddenEditor {
             background:transparent;
             color:#ffffff44;
             resize: none;
             -moz-tab-size: 4;
+            overflow:auto;
         }
         #jsResult {
             position:absolute;
@@ -44,6 +48,7 @@
             color:rgb(224, 224, 224);
             border:none;
             border-radius:1vw;
+            display:none;
         }
         .symbol {
             color:rgb(205, 199, 251);

@@ -11,6 +11,9 @@ class HyliteEditor {
         this.editorElement = undefined;
         this.language = undefined;
         this.onchangehook = (evt)=>this.onContentChanged(evt);
+        window.addEventListener("resize", (e)=>{
+            this.viewSync();
+        });
         this.options = {
             tabConversion:{
                 enabled:true,
@@ -175,6 +178,11 @@ class HyliteEditor {
                 }
             });
 
+            this.editorElement.addEventListener("scroll", (e)=>{
+                this.viewSync();
+            });
+
+            setTimeout(()=>this.viewSync(), 100);
             return true;
         }
     }
@@ -185,6 +193,7 @@ class HyliteEditor {
     hookToVisual (div) {
         if (div) {
             this.visualElement = div;
+            this.viewSync();
             return true;
         }
     }
@@ -210,6 +219,20 @@ class HyliteEditor {
         for (let i=0; i<keys.length; i++) {
             key = keys[i];
             this.options[key] = opts[key];
+        }
+    }
+    viewSync () {
+        if (this.editorElement && this.visualElement) {
+            console.log("syncing view");
+            let dr = this.visualElement.getBoundingClientRect();
+            this.editorElement.style.width = dr.width + "px";
+            this.editorElement.style.height = dr.height + "px";
+            this.visualElement.scrollTop = this.editorElement.scrollTop;
+            this.visualElement.scrollLeft = this.editorElement.scrollLeft;
+
+            if (this.visualElement.scrollTop < this.editorElement.scrollTop) {
+                this.editorElement.scrollTop = this.visualElement.scrollTop;
+            }
         }
     }
 }
