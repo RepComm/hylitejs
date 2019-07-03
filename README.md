@@ -10,3 +10,5 @@ Planned features:
 - Available offline
 
 ![alt text](demo.png "Demo")
+
+[Youtube demo](https://youtu.be/dQLC1vwqe3A)
