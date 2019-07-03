@@ -15,8 +15,8 @@ class HyliteEditor {
         this.options = {
             tabConversion:{
                 enabled:true,
-                char:"\t",
-                amount:1,
+                char:" ",
+                amount:2,
                 tabCharSize:2 //Width of chars an actual Tab char () takes up, modifies css tab-size
             },
             //TODO - Document options and implement
@@ -111,39 +111,7 @@ class HyliteEditor {
             evt.preventDefault();
             return;
         }
-        if (evt.key === "Tab") {
-            evt.preventDefault();
-            let sel = window.getSelection();
-            let offset = sel.focusOffset;
-            let focus = sel.focusNode;
-
-            focus.textContent += "  ";
-
-            let range = document.createRange();
-            range.selectNode(focus);
-            range.setStart(focus, offset+1);
-
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        } else if (evt.key === "\"") {
-            // let sel = window.getSelection();
-            // let offset = sel.focusOffset;
-            // let focus = sel.focusNode;
-
-            // focus.textContent += "\"";
-
-            // let range = document.createRange();
-            // range.selectNode(focus);
-            // range.setStart(focus, offset);
-
-            // range.collapse(true);
-            // sel.removeAllRanges();
-            // sel.addRange(range);
-        } else if (evt.key === "Enter") {
-            evt.preventDefault();
-        }
-        this.highlight(0);//offset);
+        this.highlight(this.editorElement.selectionStart);
         
     }
     /** Hook this editor class to a specific HTMLTextAreaElement
@@ -158,9 +126,37 @@ class HyliteEditor {
             this.editorElement.addEventListener("keyup", this.onchangehook);
 
             this.editorElement.addEventListener("keydown", (e)=>{
+                let start = this.editorElement.selectionStart;
+                let end = this.editorElement.selectionEnd;
+                if (e.key !== "ArrowUp" && e.key !== "ArrowDown" && e.key !== "ArrowLeft" && e.key !== "ArrowRight") {
+                    if (start !== end) {
+                        this.editorElement.setRangeText(
+                            "",
+                            this.editorElement.selectionStart+1,
+                            this.editorElement.selectionEnd
+                        );
+                        this.editorElement.selectionStart++;
+                        this.editorElement.selectionEnd = this.editorElement.selectionStart;
+                    }
+                }
+
+                if (this.options.autoType.enabled) {
+                    if (this.options.autoType.globalAutoTypeMap[e.key]) {
+                        start = this.editorElement.selectionStart;
+                        setTimeout(()=>{
+                            this.editorElement.value = this.editorElement.value.substring(0, start+1) +
+                            this.options.autoType.globalAutoTypeMap[e.key] +
+                            this.editorElement.value.substring(start+1);
+                            this.highlight(start);
+                            this.editorElement.selectionStart = start+1;
+                            this.editorElement.selectionEnd = start+1;
+                        }, 100);
+                    }
+                }
+
                 if (e.key == "Tab") {
                     e.preventDefault();
-                    let start = this.editorElement.selectionStart;
+                    start = this.editorElement.selectionStart;
                     let val = this.editorElement.value;
                     let insert = "";
                     for (let i=0; i<this.options.tabConversion.amount; i++) {
@@ -168,7 +164,7 @@ class HyliteEditor {
                     }
 
                     this.editorElement.value = val.substring(0, start) + insert + val.substring(start);
-                    this.editorElement.selectionStart = start + 2;
+                    this.editorElement.selectionStart = start + this.options.tabConversion.amount;
                     this.editorElement.selectionEnd = this.editorElement.selectionStart;
                     return false;
                 }

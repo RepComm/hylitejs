@@ -123,7 +123,7 @@ class Lexer {
                 tokens.push(currentToken);
             } else if (data[i] == "\"") {
                 let literal = Lexer.scan_string_literal("\"", i+1, data);
-                if (!literal) return false;
+                if (literal === false) return false; //Careful, empty string "" is false-y!
 
                 currentToken = {
                     type:"string_literal",
