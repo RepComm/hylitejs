@@ -11,10 +11,16 @@ class HtmlHelper {
         text.className = "operator";
         return text;
     }
-    static keyword (txt) {
+    static keyword0 (txt) {
         let text = document.createElement("text");
         text.textContent = txt;
-        text.className = "keyword";
+        text.className = "keyword0";
+        return text;
+    }
+    static keyword1 (txt) {
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "keyword1";
         return text;
     }
     static identifier (txt) {

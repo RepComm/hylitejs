@@ -10,7 +10,6 @@ class HyliteEditor {
         this.isHooked = false;
         this.editorElement = undefined;
         this.language = undefined;
-        this.lastNewLine = false;
         this.onchangehook = (evt)=>this.onContentChanged(evt);
         this.options = {
             tabConversion:{
@@ -52,8 +51,11 @@ class HyliteEditor {
                     case "operator":
                     this.visualElement.appendChild(HtmlHelper.operator(tokens[i].data));
                     break;
-                    case "keyword":
-                    this.visualElement.appendChild(HtmlHelper.keyword(tokens[i].data));
+                    case "keyword0":
+                    this.visualElement.appendChild(HtmlHelper.keyword0(tokens[i].data));
+                    break;
+                    case "keyword1":
+                    this.visualElement.appendChild(HtmlHelper.keyword1(tokens[i].data));
                     break;
                     case "identifier":
                     this.visualElement.appendChild(HtmlHelper.identifier(tokens[i].data));
@@ -93,9 +95,6 @@ class HyliteEditor {
      * @param {KeyboardEvent} evt Event that drove this change
      */
     onContentChanged (evt) {
-        if (evt.key !== "Enter") {
-            this.lastNewLine = false;
-        }
         if (evt.ctrlKey) {
             if (evt.key === "v") {
                 return;
@@ -211,7 +210,8 @@ class HyliteEditor {
 
 class HyliteLanguage {
     constructor (jsonFilePath) {
-        this.keywords;
+        this.keywords0;
+        this.keywords1;
         this.symbols; //operators
         this.literalRegex; //Number and string matching usually
         this.terminators;
@@ -225,8 +225,13 @@ class HyliteLanguage {
         return false;
     }
     isKeyword(text) {
-        for (let i=0; i<this.keywords.length; i++) {
+        for (let i=0; i<this.keywords0.length; i++) {
             if (text === this.keywords[i]) {
+                return true;
+            }
+        }
+        for (let i=0; i<this.keywords1.length; i++) {
+            if (text === this.keywords1[i]) {
                 return true;
             }
         }
@@ -244,13 +249,8 @@ class HyliteLanguage {
     static fromJson(fpath, callback) {
         fetch(fpath).then( (result)=>{
             result.json().then((json)=>{
-                let lang = new HyliteLanguage();
-                lang.keywords = json.keywords;
-                lang.symbols = json.symbols;
-                lang.literalRegex = json.literalRegex;
-                lang.terminators = json.terminators;
-
-                callback(undefined, lang);
+                json.constructor = HyliteLanguage.constructor;
+                callback(undefined, json);
             }).catch((reason)=>{
                 callback(reason, undefined);
             })

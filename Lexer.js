@@ -63,6 +63,7 @@ class Lexer {
         return result;
     }
     static lex (lang, data) {
+        //console.log(lang);
         data = data.replace(/ /g," ");
         let tokens = [];
         let currentToken;
@@ -149,9 +150,16 @@ class Lexer {
             } else if (data[i].match(/[_a-zA-Z]/)) {
                 let identifier = Lexer.scan_identifier(i, data);
 
-                if (lang.keywords.includes(identifier)) {
+                if (lang.keywords0.includes(identifier)) {
                     currentToken = {
-                        type:"keyword",
+                        type:"keyword0",
+                        data:identifier,
+                        lineNumber:currentLine,
+                        charInLine:i-thisLineCharOffset
+                    };
+                } else if (lang.keywords1.includes(identifier)) {
+                    currentToken = {
+                        type:"keyword1",
                         data:identifier,
                         lineNumber:currentLine,
                         charInLine:i-thisLineCharOffset
