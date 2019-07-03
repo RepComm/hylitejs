@@ -13,6 +13,6 @@ HyliteLanguage.fromJson("languages/javascript.json", (error, language)=>{
     editor.setLanguage(language);
     editor.hookToEditor(hiddenEditor);
     editor.hookToVisual(jsEditor);
-    editor.hookDebugTo(jsResult);
+    //editor.hookDebugTo(jsResult);
     editor.highlight(0);
 });

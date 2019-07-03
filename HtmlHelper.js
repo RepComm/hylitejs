@@ -35,6 +35,18 @@ class HtmlHelper {
         text.className = "other_text";
         return text;
     }
+    static commentline (txt) {
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "commentline";
+        return text;
+    }
+    static commentsection (txt) {
+        let text = document.createElement("text");
+        text.textContent = txt;
+        text.className = "commentsection";
+        return text;
+    }
     static number_literal (txt) {
         let text = document.createElement("text");
         text.textContent = txt;

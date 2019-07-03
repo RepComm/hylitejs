@@ -69,6 +69,12 @@ class HyliteEditor {
                     case "new_line":
                     this.visualElement.appendChild(HtmlHelper.new_line());
                     break;
+                    case "commentline":
+                    this.visualElement.appendChild(HtmlHelper.commentline(tokens[i].data));
+                    break;
+                    case "commentsection":
+                    this.visualElement.appendChild(HtmlHelper.commentsection(tokens[i].data));
+                    break;
                     default:
                     this.visualElement.appendChild(HtmlHelper.other_text(tokens[i].data));
                     break;
@@ -249,8 +255,13 @@ class HyliteLanguage {
     static fromJson(fpath, callback) {
         fetch(fpath).then( (result)=>{
             result.json().then((json)=>{
-                json.constructor = HyliteLanguage.constructor;
-                callback(undefined, json);
+                let lang = new HyliteLanguage();
+                let jkeys = Object.keys(json);
+                for (let jk of jkeys) {
+                    lang[jk] = json[jk];
+                }
+                console.log(lang);
+                callback(undefined, lang);
             }).catch((reason)=>{
                 callback(reason, undefined);
             })

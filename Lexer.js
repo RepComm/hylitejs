@@ -40,13 +40,29 @@ class Lexer {
     }
     static scan_comment_line(start, toScan) {
         let toScanLength = toScan.length;
-        let result = "";
+        let result = "//";
         for (let i=start; i<toScanLength; i++) {
             if (toScan[i] == "\n") {
                 return result;
             } else {
                 result+=toScan[i];
             }
+        }
+        return result;
+    }
+    static scan_comment_section (start, toScan) {
+        let toScanLength = toScan.length;
+        let result = "/*";
+        for (let i=start; i<toScanLength; i++) {
+            if (toScan[i] == "*") {
+                if (i !== toScan.length-1) {
+                    if (toScan[i+1] == "/") {
+                        result += "*/";
+                        return result;
+                    }
+                }
+            }
+            result+=toScan[i];
         }
         return result;
     }
@@ -93,10 +109,36 @@ class Lexer {
                 currentLine++;
                 thisLineCharOffset = i;
             } else if (data[i] == "/") {
-                if (i !== data.length-1 && data[i+1] == "/") {
-                    let cmt = Lexer.scan_comment_line(i+2, data);
-                    i+= cmt.length + 1;
-                    console.log("Code comment:", cmt); 
+                if (i !== data.length-1) {
+                    if (data[i+1] == "/") {
+                        let cmt = Lexer.scan_comment_line(i+2, data);
+                        currentToken = {
+                            type:"commentline",
+                            data:cmt,
+                            lineNumber:currentLine,
+                            charInLine:i-thisLineCharOffset
+                        }
+                        i+= cmt.length-1;
+                        tokens.push(currentToken);
+                    } else if (data[i+1] == "*") {
+                        let cmt = Lexer.scan_comment_section(i+2, data);
+                        currentToken = {
+                            type:"commentsection",
+                            data:cmt,
+                            lineNumber:currentLine,
+                            charInLine:i-thisLineCharOffset
+                        }
+                        i+= cmt.length-1;
+                        tokens.push(currentToken);
+                    } else {
+                        currentToken = {
+                            type:"operator",
+                            data:data[i],
+                            lineNumber:currentLine,
+                            charInLine:i-thisLineCharOffset
+                        }
+                        tokens.push(currentToken);
+                    }
                 } else {
                     currentToken = {
                         type:"operator",
