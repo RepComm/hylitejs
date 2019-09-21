@@ -34,6 +34,12 @@ class HyliteEditor {
                     "(":")",
                     "`":"`",
                     "/*":"*/"
+                },
+                overwrite:{ //Typing { will produce {} with auto-type, and if you type }, {}} is produced. overwrite fixes this
+                    enabled:true,
+                    timeout:2000, //Timeout where autotype overwrite will not bother you
+                    lasttime:0, //Last time autotype was used
+                    lasttype:"" //The symbol used in autotyping
                 }
             }
 
@@ -158,7 +164,24 @@ class HyliteEditor {
                             this.highlight(start);
                             this.editorElement.selectionStart = start+1;
                             this.editorElement.selectionEnd = start+1;
+
+                            if (this.options.autoType.overwrite.enabled) {
+                                this.options.autoType.overwrite.lasttime = Date.now();
+                                this.options.autoType.overwrite.lasttype = e.key;
+                            }
                         }, 100);
+                    } else if (this.options.autoType.overwrite.enabled) {
+                        if (this.options.autoType.overwrite.lasttime - Date.now() < this.options.autoType.overwrite.timeout) {
+                            if (e.key === this.options.autoType.globalAutoTypeMap[this.options.autoType.overwrite.lasttype]) {
+                                //TODO - Finish autoType overwrite
+                                start = this.editorElement.selectionStart;
+                                this.editorElement.value = this.editorElement.value.substring(0, start) +
+                                this.editorElement.value.substring(start+1);
+                                this.highlight(start);
+                                this.editorElement.selectionStart = start+1;
+                                this.editorElement.selectionEnd = start+1;
+                            }
+                        }
                     }
                 }
 
@@ -223,7 +246,7 @@ class HyliteEditor {
     }
     viewSync () {
         if (this.editorElement && this.visualElement) {
-            console.log("syncing view");
+            //console.log("syncing view");
             let dr = this.visualElement.getBoundingClientRect();
             this.editorElement.style.width = dr.width + "px";
             this.editorElement.style.height = dr.height + "px";
